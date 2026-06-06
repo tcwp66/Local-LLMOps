@@ -10,6 +10,8 @@ from .config import Settings, load_settings
 from .db import ChatLog, get_chat_log, get_summary, init_db, insert_chat_log, list_chat_logs
 from .llm_clients import build_client, count_tokens
 from .schemas import ChatRequest, ChatResponse, HealthResponse
+from evalbench.reporting import save_markdown_report
+from evalbench.runner import DEFAULT_OUTPUT_DIR, run_eval, save_eval_run
 
 
 def utc_now() -> str:
@@ -126,6 +128,20 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             f"llmops_latency_p95_ms {summary['p95_latency_ms']:.6f}",
         ]
         return Response("\n".join(lines) + "\n", media_type="text/plain; version=0.0.4")
+
+    @app.post("/evalbench/run")
+    def evalbench_run() -> dict:
+        run = run_eval()
+        json_path = save_eval_run(run, DEFAULT_OUTPUT_DIR)
+        md_path = save_markdown_report(run, DEFAULT_OUTPUT_DIR)
+        return {
+            "run_id": run.run_id,
+            "case_count": run.case_count,
+            "pipelines": run.pipelines,
+            "aggregate_metrics": [item.model_dump() for item in run.aggregate_metrics],
+            "json_report": str(json_path),
+            "markdown_report": str(md_path),
+        }
 
     return app
 

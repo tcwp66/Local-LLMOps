@@ -34,7 +34,7 @@ col2.metric("Success rate", f"{summary['success_rate'] * 100:.1f}%")
 col3.metric("Avg latency", f"{summary['avg_latency_ms']:.1f} ms")
 col4.metric("P95 latency", f"{summary['p95_latency_ms']:.1f} ms")
 
-tab_overview, tab_requests, tab_detail = st.tabs(["Overview", "Requests", "Trace Detail"])
+tab_overview, tab_requests, tab_detail, tab_evalbench = st.tabs(["Overview", "Requests", "Trace Detail", "LLM-EvalBench"])
 
 with tab_overview:
     rows = list_chat_logs(db_path, limit=200)
@@ -97,3 +97,49 @@ with tab_detail:
             st.json(item["tool_calls"])
             st.subheader("Metadata")
             st.code(json.dumps(item["metadata"], indent=2, ensure_ascii=False), language="json")
+
+with tab_evalbench:
+    latest_path = PROJECT_ROOT / "artifacts" / "evalbench" / "latest.json"
+    if not latest_path.exists():
+        st.info("No LLM-EvalBench run found. Run `python -m evalbench.cli` first.")
+    else:
+        payload = json.loads(latest_path.read_text(encoding="utf-8"))
+        st.write(
+            {
+                "run_id": payload["run_id"],
+                "created_at": payload["created_at"],
+                "case_count": payload["case_count"],
+                "pipelines": payload["pipelines"],
+            }
+        )
+        metrics_frame = pd.DataFrame(payload["aggregate_metrics"])
+        st.subheader("Pipeline comparison")
+        st.dataframe(metrics_frame, use_container_width=True, hide_index=True)
+
+        bad_cases = pd.DataFrame(payload["case_metrics"])
+        bad_cases = bad_cases[
+            (bad_cases["hit_at_3"] < 1.0)
+            | (bad_cases["context_recall"] < 1.0)
+            | (bad_cases["faithfulness"] < 0.75)
+            | (bad_cases["answer_relevancy"] < 0.75)
+            | bad_cases["error"].notna()
+        ]
+        st.subheader("Bad cases")
+        if bad_cases.empty:
+            st.success("No bad cases under the current thresholds.")
+        else:
+            st.dataframe(
+                bad_cases[
+                    [
+                        "case_id",
+                        "pipeline",
+                        "hit_at_3",
+                        "context_recall",
+                        "faithfulness",
+                        "answer_relevancy",
+                        "error",
+                    ]
+                ],
+                use_container_width=True,
+                hide_index=True,
+            )

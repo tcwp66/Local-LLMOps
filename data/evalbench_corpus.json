@@ -1,0 +1,50 @@
+[
+  {
+    "id": "deepmd-docs:model-deviation",
+    "title": "DP-GEN model deviation",
+    "text": "Model deviation measures disagreement among an ensemble of Deep Potential models. A high max force deviation marks unreliable configurations that should be labeled or filtered.",
+    "metadata": {"domain": "deepmd", "doc_type": "concept"}
+  },
+  {
+    "id": "deepmd-docs:lcurve",
+    "title": "DeepMD lcurve diagnosis",
+    "text": "A flat validation loss with falling training loss can indicate overfitting, data leakage, poor validation coverage, or an imbalanced dataset. Compare learning curves before changing model size.",
+    "metadata": {"domain": "deepmd", "doc_type": "diagnosis"}
+  },
+  {
+    "id": "project-notes:dpgen-thresholds",
+    "title": "DP-GEN trust thresholds",
+    "text": "Candidate structures are usually selected between low and high model deviation trust thresholds. Structures above the high threshold are treated as failed or unreliable exploration points.",
+    "metadata": {"domain": "deepmd", "doc_type": "operations"}
+  },
+  {
+    "id": "llmops:trace-schema",
+    "title": "Local-LLMOps trace schema",
+    "text": "Local-LLMOps records prompt, response, latency, source ids, tool calls, status, provider, model, token counts, metadata, and errors in SQLite for later debugging.",
+    "metadata": {"domain": "llmops", "doc_type": "schema"}
+  },
+  {
+    "id": "llmops:metrics",
+    "title": "Local-LLMOps metrics",
+    "text": "The metrics endpoint exposes total requests, failed requests, success rate, average latency, and p95 latency in a Prometheus-style text format.",
+    "metadata": {"domain": "llmops", "doc_type": "observability"}
+  },
+  {
+    "id": "eval:rag-metrics",
+    "title": "RAG evaluation metrics",
+    "text": "Context precision checks whether retrieved chunks are useful. Context recall checks whether the expected evidence was retrieved. Faithfulness checks whether the answer is grounded in retrieved context.",
+    "metadata": {"domain": "evaluation", "doc_type": "metrics"}
+  },
+  {
+    "id": "eval:agent-tools",
+    "title": "Agent tool evaluation",
+    "text": "Agent evaluation should track tool call success rate, tool latency, error rate, and whether tool outputs improve final answer correctness.",
+    "metadata": {"domain": "evaluation", "doc_type": "agent"}
+  },
+  {
+    "id": "ops:ollama-provider",
+    "title": "Ollama provider mode",
+    "text": "Setting LLMOPS_PROVIDER to ollama routes Local-LLMOps chat requests to a local Ollama model while keeping the same request logging and metrics interface.",
+    "metadata": {"domain": "llmops", "doc_type": "serving"}
+  }
+]

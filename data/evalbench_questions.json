@@ -1,0 +1,49 @@
+[
+  {
+    "id": "q_model_deviation",
+    "question": "What does model deviation mean in DP-GEN and how should high values be handled?",
+    "expected_answer_terms": ["model deviation", "ensemble", "high max force deviation", "unreliable"],
+    "expected_source_ids": ["deepmd-docs:model-deviation", "project-notes:dpgen-thresholds"],
+    "relevant_facts": [
+      "Model deviation measures disagreement among an ensemble of Deep Potential models",
+      "A high max force deviation marks unreliable configurations",
+      "Structures above the high threshold are treated as failed or unreliable exploration points"
+    ],
+    "metadata_filter": {"domain": "deepmd"}
+  },
+  {
+    "id": "q_llmops_trace",
+    "question": "Which fields should Local-LLMOps log to debug a RAG answer?",
+    "expected_answer_terms": ["prompt", "response", "latency", "source ids", "tool calls", "errors"],
+    "expected_source_ids": ["llmops:trace-schema"],
+    "relevant_facts": [
+      "Local-LLMOps records prompt, response, latency, source ids, tool calls, status, provider, model, token counts, metadata, and errors in SQLite"
+    ],
+    "metadata_filter": {"domain": "llmops"}
+  },
+  {
+    "id": "q_rag_metrics",
+    "question": "How do context precision, context recall, and faithfulness differ in RAG evaluation?",
+    "expected_answer_terms": ["context precision", "context recall", "faithfulness", "retrieved context"],
+    "expected_source_ids": ["eval:rag-metrics"],
+    "relevant_facts": [
+      "Context precision checks whether retrieved chunks are useful",
+      "Context recall checks whether the expected evidence was retrieved",
+      "Faithfulness checks whether the answer is grounded in retrieved context"
+    ],
+    "metadata_filter": {"domain": "evaluation"}
+  },
+  {
+    "id": "q_agent_tool",
+    "question": "What should an Agent evaluation track when the pipeline calls tools?",
+    "expected_answer_terms": ["tool call success rate", "tool latency", "error rate", "answer correctness"],
+    "expected_source_ids": ["eval:agent-tools"],
+    "relevant_facts": [
+      "Agent evaluation should track tool call success rate, tool latency, error rate, and whether tool outputs improve final answer correctness"
+    ],
+    "metadata_filter": {"domain": "evaluation"},
+    "requires_tool": true,
+    "expected_tool": "tool_trace_checker",
+    "tool_input": {"trace_id": "demo-agent-trace"}
+  }
+]

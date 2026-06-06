@@ -1,6 +1,6 @@
 # Local-LLMOps
 
-Local-LLMOps is a small, resume-ready LLM serving and observability project. It provides a FastAPI gateway for local model calls, stores every request in SQLite, exposes simple Prometheus-style metrics, and includes a Streamlit dashboard for latency, error rate, request history, and trace inspection.
+Local-LLMOps is a small, resume-ready LLM serving and observability project. It provides a FastAPI gateway for local model calls, stores every request in SQLite, exposes simple Prometheus-style metrics, includes a Streamlit dashboard for latency, error rate, request history, and trace inspection, and now ships with LLM-EvalBench for RAG / Agent evaluation.
 
 The default provider is `echo`, so the project can run without downloading a model. Switch `LLMOPS_PROVIDER=ollama` to call a local Ollama server.
 
@@ -17,6 +17,19 @@ FastAPI Gateway
         |-- /metrics endpoint
         v
 Streamlit Dashboard
+```
+
+LLM-EvalBench sits beside the serving layer and compares multiple pipelines on the same eval set:
+
+```text
+Eval questions + corpus
+        |
+        v
+no_rag / naive_rag / metadata_filter / reranker / tools
+        |
+        v
+hit@k, context precision/recall, faithfulness, answer relevancy,
+tool call success, latency, error rate, bad-case report
 ```
 
 ## Quick Start
@@ -57,6 +70,31 @@ uvicorn backend.main:app --reload --port 8000
 - `GET /logs?limit=50` returns recent requests.
 - `GET /logs/{request_id}` returns one request trace.
 - `GET /metrics` returns Prometheus-style counters and latency gauges.
+- `POST /evalbench/run` runs the bundled LLM-EvalBench suite and writes JSON / Markdown reports.
+
+## LLM-EvalBench
+
+Run the offline evaluation suite:
+
+```powershell
+cd local-llmops
+python -m evalbench.cli
+```
+
+This creates:
+
+- `artifacts/evalbench/latest.json`
+- `artifacts/evalbench/latest.md`
+
+The bundled benchmark compares:
+
+- `no_rag`
+- `naive_rag`
+- `rag_metadata_filter`
+- `rag_reranker`
+- `rag_tools`
+
+Metrics include `hit@1`, `hit@3`, `hit@5`, `context_precision`, `context_recall`, `faithfulness`, `answer_relevancy`, `tool_call_success`, latency, error rate, and bad-case rows. The Streamlit dashboard has an `LLM-EvalBench` tab that reads the latest report.
 
 ## DeepMD Copilot Integration
 
@@ -78,4 +116,4 @@ The backend is exposed on `http://127.0.0.1:8000` and the dashboard on `http://1
 
 ## Resume Bullet
 
-Built Local-LLMOps, a local LLM serving and observability platform based on FastAPI, SQLite, and Streamlit. The system provides a unified `/chat` gateway for local model calls, records request latency, errors, RAG source IDs, and tool traces, and exposes dashboard and metrics views for debugging model behavior and service reliability.
+Built Local-LLMOps, a local LLM serving, observability, and evaluation platform based on FastAPI, SQLite, and Streamlit. The system provides a unified `/chat` gateway for local model calls, records request latency, errors, RAG source IDs, and tool traces, and includes LLM-EvalBench to compare no-RAG, RAG, metadata filtering, reranking, and tool-augmented pipelines with hit@k, context precision/recall, faithfulness, answer relevancy, latency, and bad-case reports.
